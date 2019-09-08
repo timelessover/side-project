@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        body {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .box {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: skyblue;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="box" id='box'>
+    </div>
+
+    <script>
+        class Drag {
+            constructor(el) {
+                this.el = el
+                this.bind = this.bind()
+                this.control = {
+                    isDown: false,
+                    mouse: {}
+                }
+            }
+            bind() {
+                this.el.addEventListener('mousedown', this.mouseDown)
+                this.el.addEventListener('mousemove', this.mouseMove)
+                window.addEventListener('mouseup', this.mouseUp)
+            }
+            mouseDown = (e) => {
+                this.control.isDown = true
+                this.el.style.cursor = 'move'
+                this.control.mouse = {
+                    startX: e.clientX,
+                    startY: e.clientY,
+                    offsetLeft: this.el.offsetLeft,
+                    offsetTop: this.el.offsetTop,
+                }
+            }
+            mouseMove = (e) => {
+                if (!this.control.isDown) {
+                    return
+                }
+
+                const el_height = this.el.style.height
+                const el_width = this.el.style.width
+
+                let mouse = this.control.mouse
+
+                //计算偏移位置
+                let offsetLeft = mouse.offsetLeft + e.clientX - mouse.startX
+                let offsetTop = mouse.offsetTop + e.clientY - mouse.startY
+
+                //设置偏移距离的范围[0,window.innerWidth - el_width]
+                offsetLeft = Math.max(0, Math.min(offsetLeft, window.innerWidth - el_width))
+                offsetTop = Math.max(0, Math.min(offsetTop, window.innerHeight - el_height))
+
+                this.el.style.left = offsetLeft + 'px';
+                this.el.style.top = offsetTop + 'px';
+            }
+            mouseUp = () => {
+                this.control.isDown = false
+                this.el.style.cursor = 'default'
+                this.control.mouse = null
+            }
+        }
+
+
+        const box = document.getElementById('box')
+
+        const drag = new Drag(box)
+    </script>
+
+</body>
+
+</html>
